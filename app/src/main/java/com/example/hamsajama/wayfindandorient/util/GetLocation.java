@@ -9,15 +9,9 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import com.example.hamsajama.wayfindandorient.R;
 import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 
 /**
@@ -29,6 +23,7 @@ public class GetLocation implements LocationListener {
     private Double longitude = 0.0;
     private GoogleMap mMap;
     static final int MY_PERMISSION_REQUEST_LOCATION=1;
+    Location myLocation;
 
     public GetLocation(Context context) {
         final LocationManager locationManager = (LocationManager) context
@@ -55,19 +50,24 @@ public class GetLocation implements LocationListener {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000,   // 3 sec
                 2, (android.location.LocationListener) this);
         setMostRecentLocation(locationManager.getLastKnownLocation(provider));
-
+        myLocation = new Location("");
+        myLocation.setLatitude(this.getLatitude());
+        myLocation.setLongitude(this.getLongitude());
     }
 
     private void setMostRecentLocation(Location lastKnownLocation) {
         if(lastKnownLocation==null){
             latitude=0.0;
+            setLatitude(latitude);
             longitude=0.0;
+            setLongitude(longitude);
         }else{
             latitude = lastKnownLocation.getLatitude();
             longitude = lastKnownLocation.getLongitude();
         }
     }
     Marker currentLocationMarker;
+
     @Override
     public void onLocationChanged(Location location) {
 
@@ -86,27 +86,10 @@ public class GetLocation implements LocationListener {
         if(currentLocationMarker!=null){
             currentLocationMarker.remove();
         }
-
         latitude = location.getLatitude();
+        setLatitude(latitude);
         longitude = location.getLongitude();
-
-        LatLng myPosition = new LatLng(latitude, longitude);
-        //LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-        if(getmMap()!=null){
-            currentLocationMarker = getmMap().addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.myposition))
-                    .position(myPosition)
-                    .title("Current Location")
-                    .rotation(360));
-            // Move the camera instantly to the user with a zoom of 20.
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(myPosition)
-                    .zoom(20)
-                    .bearing(bearing)
-                    .tilt(80)
-                    .build();
-            getmMap().animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        }
+        setLongitude(longitude);
     }
 
     public GoogleMap getmMap() { return mMap; }
@@ -127,5 +110,11 @@ public class GetLocation implements LocationListener {
     public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
+    public Location getMyLocation() {
+        return myLocation;
+    }
 
+    public void setMyLocation(Location myLocation) {
+        this.myLocation = myLocation;
+    }
 }

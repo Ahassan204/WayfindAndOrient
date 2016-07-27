@@ -7,15 +7,14 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.hamsajama.wayfindandorient.MainActivity"
-    android:id="@+id/navigateButton"
-    android:onClick="startNav">
+    tools:context="com.example.hamsajama.wayfindandorient.MainActivity">
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Navigate"
+        android:text="@string/navigate"
         android:id="@+id/button"
         android:layout_marginTop="156dp"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:onClick="startNav" />
 </RelativeLayout>

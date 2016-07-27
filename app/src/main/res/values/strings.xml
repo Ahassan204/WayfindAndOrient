@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">WayfindAndOrient</string>
     <string name="title_activity_navigate">Route Navigation</string>
+    <string name="navigate">Navigate</string>
 </resources>

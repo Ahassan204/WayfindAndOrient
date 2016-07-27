@@ -16,6 +16,5 @@ public class MainActivity extends AppCompatActivity {
     public void startNav(View view) {
         Intent navigate = new Intent(MainActivity.this, NavigateActivity.class);
         startActivity(navigate);
-
     }
 }
