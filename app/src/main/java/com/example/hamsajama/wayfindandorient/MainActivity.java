@@ -9,6 +9,8 @@ import com.example.hamsajama.wayfindandorient.motionUtil.MotionDection;
 
 public class MainActivity extends AppCompatActivity  {
 
+    //Tests
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
