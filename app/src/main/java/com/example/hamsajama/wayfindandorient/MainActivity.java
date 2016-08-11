@@ -1,14 +1,11 @@
 package com.example.hamsajama.wayfindandorient;
 
 import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
-import com.example.hamsajama.wayfindandorient.util.MotionDection;
+import com.example.hamsajama.wayfindandorient.motionUtil.MotionDection;
 
 public class MainActivity extends AppCompatActivity  {
 

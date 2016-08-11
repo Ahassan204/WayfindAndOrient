@@ -10,11 +10,11 @@
     tools:context="com.example.hamsajama.wayfindandorient.MainActivity">
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
         android:text="@string/navigate"
         android:id="@+id/button"
-        android:layout_marginTop="156dp"
-        android:layout_centerHorizontal="true"
-        android:onClick="startNav" />
+        android:onClick="startNav"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>
