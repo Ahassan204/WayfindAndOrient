@@ -2,6 +2,7 @@ package com.example.hamsajama.wayfindandorient;
 
 
 import android.app.PendingIntent;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -10,11 +11,12 @@ import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.hamsajama.wayfindandorient.geofenceUtil.Constants;
+import com.example.hamsajama.wayfindandorient.geofenceUtil.GeoConstants;
 import com.example.hamsajama.wayfindandorient.geofenceUtil.GeofenceTransitionsIntentService;
 import com.example.hamsajama.wayfindandorient.routes.Route1;
 import com.example.hamsajama.wayfindandorient.util.GetLocation;
@@ -73,23 +75,22 @@ public class NavigateActivity extends FragmentActivity implements OnMapReadyCall
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigate);
-        //myLocation = new GetLocation(this);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         // Empty list for storing geofences.
-        mGeofenceList = new ArrayList<Geofence>();
+        mGeofenceList = new ArrayList<>();
 
         // Initially set the PendingIntent used in addGeofences() and removeGeofences() to null.
         mGeofencePendingIntent = null;
 
         // Retrieve an instance of the SharedPreferences object.
-        mSharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME,
+        mSharedPreferences = getSharedPreferences(GeoConstants.SHARED_PREFERENCES_NAME,
                 MODE_PRIVATE);
         // Get the value of mGeofencesAdded from SharedPreferences. Set to false as a default.
-        mGeofencesAdded = mSharedPreferences.getBoolean(Constants.GEOFENCES_ADDED_KEY, false);
+        mGeofencesAdded = mSharedPreferences.getBoolean(GeoConstants.GEOFENCES_ADDED_KEY, false);
         // Get the geofences used. Geofence data is hard coded in this sample.
         populateGeofenceList();
 
@@ -97,100 +98,18 @@ public class NavigateActivity extends FragmentActivity implements OnMapReadyCall
         buildGoogleApiClient();
 
     }
-    /**
-     * Builds a GoogleApiClient. Uses the {@code #addApi} method to request the LocationServices API.
-     */
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mGoogleApiClient.disconnect();
-    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        float bearing = 0;
-
-        List<LatLng> points = Route1.getRoute();
-        LatLng currentLocation = new LatLng(points.get(0).latitude, points.get(0).longitude);
-        LatLng onPoint = new LatLng(points.get(4).latitude, points.get(4).longitude);
-        LatLng destination = new LatLng(points.get(points.size() - 1).latitude, points.get(points.size() - 1).longitude);
-//        double lat = myLocation.getLatitude();
-//        double lon = myLocation.getLongitude();
-//
-//        if(myLocation!=null){
-//            currentLocation = new LatLng(myLocation.getLatitude(),myLocation.getLongitude());
-//        }else {
-//            currentLocation = new LatLng(0,0);
-//        }
-
-        //LatLng currentLocation = new LatLng(0,0);
-
-        mMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.myposition))
-                .position(currentLocation)
-                .title("Current Location")
-                .rotation(360));
-
-        mMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.myposition))
-                .position(destination)
-                .title("Current Location")
-                .rotation(360));
-
-        mMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.myposition))
-                .position(onPoint)
-                .title("Current Location")
-                .rotation(360));
+        ArrayList<LatLng>points = Route1.getRoute();
 
         mMap.addPolyline(
                 new PolylineOptions().addAll(points
                 ).width(100).color(Color.rgb(74, 193, 232)).geodesic(true)
         );
-        for (Map.Entry<String, LatLng> entry : Constants.LONDON_LANDMARKS.entrySet()) {
 
-            CircleOptions circleOptions = new CircleOptions()
-                    .center(new LatLng(entry.getValue().latitude,entry.getValue().longitude))
-                    .radius(Constants.GEOFENCE_RADIUS_IN_METERS)
-                    .fillColor(0x40ff0000)
-                    .strokeColor(Color.RED)
-                    .strokeWidth(2);
-            mMap.addCircle(circleOptions);
-        }
-
-        double tolerance = 10; // meters
-        boolean isLocationOnPath = PolyUtil.isLocationOnPath(currentLocation, points, true, tolerance);
-
-        // Change the toast to pop up alert and vibration if it is false.
-        if (isLocationOnPath) {
-            Toast.makeText(getApplicationContext(), "Location is on path", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(getApplicationContext(), "Location is NOT on path", Toast.LENGTH_SHORT).show();
-        }
-
-        // Move the camera instantly to the user with a zoom of 20.
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(currentLocation)
-                .zoom(20)
-                .bearing(bearing)
-                .tilt(80)
-                .build();
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
+        myLocation.setmMap(mMap);
     }
 
     public void toast(View v) {
@@ -233,7 +152,7 @@ public class NavigateActivity extends FragmentActivity implements OnMapReadyCall
      * the user's location.
      */
     public void populateGeofenceList() {
-        for (Map.Entry<String, LatLng> entry : Constants.LONDON_LANDMARKS.entrySet()) {
+        for (Map.Entry<String, LatLng> entry : GeoConstants.LONDON_LANDMARKS.entrySet()) {
 
             mGeofenceList.add(new Geofence.Builder()
                     // Set the request ID of the geofence. This is a string to identify this
@@ -244,12 +163,12 @@ public class NavigateActivity extends FragmentActivity implements OnMapReadyCall
                     .setCircularRegion(
                             entry.getValue().latitude,
                             entry.getValue().longitude,
-                            Constants.GEOFENCE_RADIUS_IN_METERS
+                            GeoConstants.GEOFENCE_RADIUS_IN_METERS
                     )
 
                     // Set the expiration duration of the geofence. This geofence gets automatically
                     // removed after this period of time.
-                    .setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
+                    .setExpirationDuration(GeoConstants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
 
                     // Set the transition types of interest. Alerts are only generated for these
                     // transition. We track entry and exit transitions in this sample.
@@ -290,6 +209,45 @@ public class NavigateActivity extends FragmentActivity implements OnMapReadyCall
         // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
         // onConnectionFailed.
         Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
+    }
+    protected void onResume() {
+        super.onResume();
+        myLocation = new GetLocation(this);
+    }
+
+    /**
+     * Builds a GoogleApiClient. Uses the {@code #addApi} method to request the LocationServices API.
+     */
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mGoogleApiClient.disconnect();
+    }
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setMessage("Are you sure you want to exit?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        NavigateActivity.super.onBackPressed();
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
     }
 
 }

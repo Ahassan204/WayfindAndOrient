@@ -7,8 +7,8 @@ import java.util.HashMap;
 /**
  * Created by hamsajama on 10/08/2016.
  */
-public class Constants {
-    private Constants() {
+public class GeoConstants {
+    private GeoConstants() {
     }
 
     public static final String PACKAGE_NAME = "com.example.hamsajama.wayfindandorient.geofenceUtil";
