@@ -1,14 +1,19 @@
-package com.example.hamsajama.wayfindandorient.util;
-
+package com.example.hamsajama.wayfindandorient.motionUtil;
+import static com.example.hamsajama.wayfindandorient.motionUtil.MotionConstants.zero;
+import static com.example.hamsajama.wayfindandorient.motionUtil.MotionConstants.ninety;
+import static com.example.hamsajama.wayfindandorient.motionUtil.MotionConstants.oneEighty;
+import static com.example.hamsajama.wayfindandorient.motionUtil.MotionConstants.twoSeventy;
+import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.Surface;
+import android.view.View;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 /**
  * Created by hamsajama on 05/08/2016.
@@ -38,20 +43,29 @@ public class MotionDection implements SensorEventListener {
         switch (wm.getDefaultDisplay().getRotation()) {
             case Surface.ROTATION_0:
                 Log.d(TAG, "Rotation 0!!");
+                show((Activity) context,zero);
                 break;
             case Surface.ROTATION_90:
                 Log.d(TAG, "Rotation 90!!");
+                show((Activity) context,ninety);
                 break;
             case Surface.ROTATION_180:
                 Log.d(TAG, "Rotation 180");
+                show((Activity) context,oneEighty);
                 break;
             case Surface.ROTATION_270:
                 Log.d(TAG, "Rotation 270");
+                show((Activity) context,twoSeventy);
                 break;
             default:
                 Log.w(TAG, "Rotation unknown");
                 break;
         }
+    }
+    public void show(Activity activity, String message) {
+        View rootView = activity.getWindow().getDecorView().findViewById(android.R.id.content);
+        Snackbar.make(rootView, message, Snackbar.LENGTH_LONG).show();
+
     }
     /**
      * Convert degrees to absolute tilt value between 0-100
