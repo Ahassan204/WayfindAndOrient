@@ -32,7 +32,6 @@ public class GetLocation2 implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
     Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
-    private LocationRequest mLocationRequest;
     Context context;
 
     public GetLocation2(Context context) {
@@ -53,7 +52,7 @@ public class GetLocation2 implements GoogleApiClient.ConnectionCallbacks,
     }
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        mLocationRequest = LocationRequest.create();
+        LocationRequest mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setInterval(10000); // Update location every second
 
@@ -95,13 +94,8 @@ public class GetLocation2 implements GoogleApiClient.ConnectionCallbacks,
         if(currentLocationMarker!=null){
             currentLocationMarker.remove();
         }
-        if(location!=null){
-            latitude = location.getLatitude();
-            longitude = location.getLongitude();
-        }else{
-            latitude = getLatitude();
-            longitude = getLongitude();
-        }
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
         List<LatLng> points = Route1.getRoute();
         LatLng myPosition = new LatLng(latitude, longitude);
 
