@@ -250,4 +250,9 @@ public class NavigateActivity extends FragmentActivity implements OnMapReadyCall
                 .show();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        overridePendingTransition(android.R.anim.slide_in_left,android.R.anim.slide_out_right);
+    }
 }

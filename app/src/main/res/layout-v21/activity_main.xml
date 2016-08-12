@@ -18,7 +18,8 @@
         android:textSize="24sp"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/cardlayout"
-        android:textColor="@color/colorPrimaryDark"/>
+        android:background="@color/colorAccent"
+        android:textColor="@color/colorPrimaryDark"
+        android:elevation="20dp" />
 
 </RelativeLayout>
