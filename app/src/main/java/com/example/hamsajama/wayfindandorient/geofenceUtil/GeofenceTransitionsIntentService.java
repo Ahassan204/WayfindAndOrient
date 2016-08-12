@@ -12,7 +12,7 @@ import android.support.v7.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.example.hamsajama.wayfindandorient.NavigateActivity;
+import com.example.hamsajama.wayfindandorient.activities.NavigateActivity;
 import com.example.hamsajama.wayfindandorient.R;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;

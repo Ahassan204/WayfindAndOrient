@@ -1,11 +1,11 @@
-package com.example.hamsajama.wayfindandorient;
+package com.example.hamsajama.wayfindandorient.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import com.example.hamsajama.wayfindandorient.motionUtil.MotionDection;
+import com.example.hamsajama.wayfindandorient.R;
 
 /**
  * Created by hamsajama on 12/08/2016.

@@ -1,4 +1,4 @@
-package com.example.hamsajama.wayfindandorient;
+package com.example.hamsajama.wayfindandorient.activities;
 
 
 import android.app.PendingIntent;
@@ -14,36 +14,29 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
+import com.example.hamsajama.wayfindandorient.R;
 import com.example.hamsajama.wayfindandorient.geofenceUtil.GeoConstants;
-import com.example.hamsajama.wayfindandorient.geofenceUtil.GeofenceTransitionsIntentService;
 import com.example.hamsajama.wayfindandorient.routes.Route1;
 import com.example.hamsajama.wayfindandorient.util.GetLocation;
+import com.example.hamsajama.wayfindandorient.util.GetLocation2;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.maps.android.PolyUtil;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class NavigateActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
-    GetLocation myLocation;
+    GetLocation2 myLocation;
     GoogleMap mMap;
     protected static final String TAG = "NavigateActivity";
     /**
@@ -180,16 +173,6 @@ public class NavigateActivity extends FragmentActivity implements OnMapReadyCall
             Log.i(TAG, "Geofence created!");
         }
     }
-    private PendingIntent getGeofencePendingIntent() {
-        // Reuse the PendingIntent if we already have it.
-        if (mGeofencePendingIntent != null) {
-            return mGeofencePendingIntent;
-        }
-        Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
-        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
-        // addGeofences() and removeGeofences().
-        return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-    }
 
     @Override
     public void onConnected(Bundle connectionHint) {
@@ -210,10 +193,7 @@ public class NavigateActivity extends FragmentActivity implements OnMapReadyCall
         // onConnectionFailed.
         Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
     }
-    protected void onResume() {
-        super.onResume();
-        myLocation = new GetLocation(this);
-    }
+
 
     /**
      * Builds a GoogleApiClient. Uses the {@code #addApi} method to request the LocationServices API.
@@ -230,7 +210,10 @@ public class NavigateActivity extends FragmentActivity implements OnMapReadyCall
         super.onStart();
         mGoogleApiClient.connect();
     }
-
+    protected void onResume() {
+        super.onResume();
+        myLocation = new GetLocation2(this);
+    }
     @Override
     protected void onStop() {
         super.onStop();

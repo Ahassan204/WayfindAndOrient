@@ -1,14 +1,15 @@
-package com.example.hamsajama.wayfindandorient;
+package com.example.hamsajama.wayfindandorient.activities;
 
+import com.example.hamsajama.wayfindandorient.R;
 import com.example.hamsajama.wayfindandorient.adapter.CustomAdapter;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 /**
  * Created by hamsajama on 11/08/2016.
@@ -29,8 +30,10 @@ public class RoutesActivity extends AppCompatActivity {
                 new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        String food = String.valueOf(parent.getItemAtPosition(position));
-                        Toast.makeText(RoutesActivity.this, food, Toast.LENGTH_LONG).show();
+//                        String food = String.valueOf(parent.getItemAtPosition(position));
+//                        Toast.makeText(RoutesActivity.this, food, Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(RoutesActivity.this,NavigateActivity.class);
+                        startActivity(intent);
                     }
                 }
         );
