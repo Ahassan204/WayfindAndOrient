@@ -8,20 +8,24 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.hamsajama.wayfindandorient.R;
 import com.example.hamsajama.wayfindandorient.geofenceUtil.GeoConstants;
+import com.example.hamsajama.wayfindandorient.geofenceUtil.GeofenceTransitionsIntentService;
 import com.example.hamsajama.wayfindandorient.routes.Route1;
-import com.example.hamsajama.wayfindandorient.util.GetLocation;
-import com.example.hamsajama.wayfindandorient.util.GetLocation2;
+import com.example.hamsajama.wayfindandorient.util.GetMyLocation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
@@ -35,8 +39,8 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class NavigateActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
-    GetLocation2 myLocation;
+        GoogleApiClient.OnConnectionFailedListener, ResultCallback<Status> {
+    GetMyLocation myLocation;
     GoogleMap mMap;
     protected static final String TAG = "NavigateActivity";
     /**
@@ -84,14 +88,26 @@ public class NavigateActivity extends FragmentActivity implements OnMapReadyCall
                 MODE_PRIVATE);
         // Get the value of mGeofencesAdded from SharedPreferences. Set to false as a default.
         mGeofencesAdded = mSharedPreferences.getBoolean(GeoConstants.GEOFENCES_ADDED_KEY, false);
+
         // Get the geofences used. Geofence data is hard coded in this sample.
         populateGeofenceList();
-
         // Kick off the request to build GoogleApiClient.
+
         buildGoogleApiClient();
-
+        //addGeofences();
+        //Intent intent = new Intent(this,GeofenceTransitionsIntentService.class);
+        //startService(intent);
     }
-
+    /**
+     * Builds a GoogleApiClient. Uses the {@code #addApi} method to request the LocationServices API.
+     */
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -140,6 +156,44 @@ public class NavigateActivity extends FragmentActivity implements OnMapReadyCall
         // Return a GeofencingRequest.
         return builder.build();
     }
+
+    public void addGeofences() {
+        if (!mGoogleApiClient.isConnected()) {
+            Toast.makeText(this, getString(R.string.not_connected), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            LocationServices.GeofencingApi.addGeofences(
+                    mGoogleApiClient,
+                    // The GeofenceRequest object.
+                    getGeofencingRequest(),
+                    // A pending intent that that is reused when calling removeGeofences(). This
+                    // pending intent is used to generate an intent when a matched geofence
+                    // transition is observed.
+                    getGeofencePendingIntent()
+            ).setResultCallback(this); // Result processed in onResult().
+        } catch (SecurityException securityException) {
+            // Catch exception generated if the app does not use ACCESS_FINE_LOCATION permission.
+            logSecurityException(securityException);
+        }
+    }
+
+    private void logSecurityException(SecurityException securityException) {
+        Log.e(TAG, "Invalid location permission. " +
+                "You need to use ACCESS_FINE_LOCATION with geofences", securityException);
+    }
+
+    private PendingIntent getGeofencePendingIntent() {
+        // Reuse the PendingIntent if we already have it.
+        if (mGeofencePendingIntent != null) {
+            return mGeofencePendingIntent;
+        }
+        Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
+        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
+        // addGeofences() and removeGeofences().
+        return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
     /**
      * This sample hard codes geofence data. A real app might dynamically create geofences based on
      * the user's location.
@@ -170,6 +224,8 @@ public class NavigateActivity extends FragmentActivity implements OnMapReadyCall
 
                     // Create the geofence.
                     .build());
+
+            
             Log.i(TAG, "Geofence created!");
         }
     }
@@ -177,6 +233,7 @@ public class NavigateActivity extends FragmentActivity implements OnMapReadyCall
     @Override
     public void onConnected(Bundle connectionHint) {
         Log.i(TAG, "Connected to GoogleApiClient");
+        addGeofences();
     }
 
     @Override
@@ -194,17 +251,6 @@ public class NavigateActivity extends FragmentActivity implements OnMapReadyCall
         Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
     }
 
-
-    /**
-     * Builds a GoogleApiClient. Uses the {@code #addApi} method to request the LocationServices API.
-     */
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
     @Override
     protected void onStart() {
         super.onStart();
@@ -212,7 +258,7 @@ public class NavigateActivity extends FragmentActivity implements OnMapReadyCall
     }
     protected void onResume() {
         super.onResume();
-        myLocation = new GetLocation2(this);
+        myLocation = new GetMyLocation(this);
     }
     @Override
     protected void onStop() {
@@ -237,5 +283,10 @@ public class NavigateActivity extends FragmentActivity implements OnMapReadyCall
     protected void onPause() {
         super.onPause();
         overridePendingTransition(android.R.anim.slide_in_left,android.R.anim.slide_out_right);
+    }
+
+    @Override
+    public void onResult(@NonNull Status status) {
+
     }
 }
