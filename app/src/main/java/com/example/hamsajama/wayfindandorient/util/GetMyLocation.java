@@ -1,11 +1,19 @@
 package com.example.hamsajama.wayfindandorient.util;
 
+import android.Manifest;
+import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.hamsajama.wayfindandorient.R;
 import com.example.hamsajama.wayfindandorient.routes.Route1;
@@ -28,13 +36,14 @@ import java.util.List;
 /**
  * Created by hamsajama on 12/08/2016.
  */
-public class GetLocation2 implements GoogleApiClient.ConnectionCallbacks,
+public class GetMyLocation implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
     Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
     Context context;
+    static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
 
-    public GetLocation2(Context context) {
+    public GetMyLocation(Context context) {
         this.context = context;
 
         buildGoogleApiClient();
@@ -50,12 +59,26 @@ public class GetLocation2 implements GoogleApiClient.ConnectionCallbacks,
 
 
     }
+
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         LocationRequest mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setInterval(10000); // Update location every second
 
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
 
 
@@ -65,6 +88,30 @@ public class GetLocation2 implements GoogleApiClient.ConnectionCallbacks,
             latitude = mLastLocation.getLatitude();
             longitude = mLastLocation.getLongitude();
 
+        }
+    }
+    public void onRequestPermissionsResult(
+            int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(context,
+                            "permission was granted, :)",
+                            Toast.LENGTH_LONG).show();
+
+                } else {
+                    Toast.makeText(context,
+                            "permission denied, ...:(",
+                            Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
         }
     }
 
@@ -118,6 +165,7 @@ public class GetLocation2 implements GoogleApiClient.ConnectionCallbacks,
             getmMap().animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
     }
+
     public Double getLatitude() {
         return latitude;
     }
@@ -131,4 +179,5 @@ public class GetLocation2 implements GoogleApiClient.ConnectionCallbacks,
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         buildGoogleApiClient();
     }
+
 }

@@ -50,6 +50,9 @@
             android:screenOrientation="portrait"
             android:name=".activities.CarerActivity"
             android:label="@string/title_activity_carer"></activity>
+        <service
+            android:name=".geofenceUtil.GeofenceTransitionsIntentService"
+            android:label="Geofence Transition"></service>
     </application>
 
 </manifest>

@@ -17,13 +17,13 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
     }
     public void startUserActivity(View view) {
-        Intent navigate = new Intent(HomeActivity.this, UserActivity.class);
-        startActivity(navigate);
+        Intent userActivity = new Intent(HomeActivity.this, UserActivity.class);
+        startActivity(userActivity);
         overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
     }
     public void startCarerActivity(View view) {
-        Intent navigate = new Intent(HomeActivity.this, CarerActivity.class);
-        startActivity(navigate);
+        Intent carerActivity = new Intent(HomeActivity.this, CarerActivity.class);
+        startActivity(carerActivity);
         overridePendingTransition(android.R.anim.slide_in_left,android.R.anim.slide_out_right);
     }
 }
