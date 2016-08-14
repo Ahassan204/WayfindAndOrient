@@ -2,6 +2,7 @@ package com.example.hamsajama.wayfindandorient.services;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
@@ -88,7 +89,10 @@ public class ActivityRecognizedService extends IntentService {
                         //Add popup window with buttons(SOS)
                         for(int i=0; i<10; i++){
                             if(i==5){
-                                
+                                Snackbar snackbar = Snackbar
+                                        .make(coordinatorLayout, "Welcome to AndroidHive", Snackbar.LENGTH_LONG);
+
+                                snackbar.show();
                             }
                         }
 
