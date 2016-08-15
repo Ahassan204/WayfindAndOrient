@@ -85,6 +85,7 @@ public class ActivityRecognizedService extends IntentService {
                 case DetectedActivity.STILL: {
                     Log.e( "ActivityRecogition", "Still: " + activity.getConfidence() );
                     if( activity.getConfidence() >= 75 ) {
+                        //VERY IMPORTANT
                         //Add timer
                         //Add popup window with buttons(SOS)
                         for(int i=0; i<10; i++){
